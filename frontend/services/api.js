@@ -5,8 +5,8 @@
 // Configuration Switch: Change this to "backend" to use real hardware data
 export const DATA_SOURCE = "backend"; // "simulation" | "backend"
 
-// Local backend endpoint assuming FastAPI runs on standard 8000 port
-const BACKEND_URL = "http://localhost:8001/api"; 
+// Dynamic backend endpoint: uses VITE_BACKEND_URL, relative /api on Vercel, or localhost in local dev
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:8001/api" : "/api"); 
 
 // -------------------------------------------------------------
 // SIMULATION MODE LOGIC
