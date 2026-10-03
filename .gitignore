@@ -7,13 +7,16 @@ venv/
 # Build outputs
 dist/
 build/
+.vite/
+frontend/.vite/
 
-# Python caches
+# Python & System caches
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .pytest_cache/
+*.log
 
 # Environment and IDE files
 .env
