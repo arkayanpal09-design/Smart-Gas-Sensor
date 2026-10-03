@@ -1,0 +1,196 @@
+:root {
+  --bg-primary: #0a0e17;
+  --bg-secondary: rgba(22, 30, 48, 0.6);
+  --bg-card: rgba(30, 41, 59, 0.7);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  --color-safe: #10b981;
+  --color-safe-glow: rgba(16, 185, 129, 0.4);
+  
+  --color-warning: #f59e0b;
+  --color-warning-glow: rgba(245, 158, 11, 0.4);
+  
+  --color-danger: #ef4444;
+  --color-danger-glow: rgba(239, 68, 68, 0.4);
+  
+  --color-accent: #3b82f6;
+  --color-accent-glow: rgba(59, 130, 246, 0.4);
+  
+  --border-color: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(12px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  margin: 0;
+  background-image: 
+    radial-gradient(ellipse at top right, rgba(30, 64, 175, 0.15), transparent 40%),
+    radial-gradient(ellipse at bottom left, rgba(16, 185, 129, 0.1), transparent 40%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glass panel */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Data value display */
+.data-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Status styles */
+.status-safe { color: var(--color-safe); }
+.status-warning { color: var(--color-warning); }
+.status-danger { color: var(--color-danger); }
+
+.bg-safe { background-color: var(--color-safe); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-danger { background-color: var(--color-danger); }
+
+/* Value badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-safe {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-warning {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-danger {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Base dashboard grid */
+.dashboard-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-areas:
+    "header header header header"
+    "gas-monitor gas-graph gas-graph safety"
+    "motion alerts alerts device";
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 24px;
+}
+
+/* Layout areas */
+.area-header { grid-area: header; }
+.area-gas-monitor { grid-area: gas-monitor; display: flex; flex-direction: column; }
+.area-gas-graph { grid-area: gas-graph; display: flex; flex-direction: column; }
+.area-motion { grid-area: motion; display: flex; flex-direction: column; }
+.area-safety { grid-area: safety; display: flex; flex-direction: column; }
+.area-alerts { grid-area: alerts; display: flex; flex-direction: column; }
+.area-device { grid-area: device; display: flex; flex-direction: column; }
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .dashboard-container {
+    grid-template-areas:
+      "header header header"
+      "gas-monitor gas-graph gas-graph"
+      "safety motion device"
+      "alerts alerts alerts";
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-container {
+    grid-template-areas:
+      "header header"
+      "gas-monitor safety"
+      "gas-graph gas-graph"
+      "motion device"
+      "alerts alerts";
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    grid-template-areas:
+      "header"
+      "safety"
+      "gas-monitor"
+      "gas-graph"
+      "motion"
+      "device"
+      "alerts";
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Progress bar / Gauge styling */
+.level-indicator {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.level-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.5s ease;
+}
+
+/* Animation utilities */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.animate-pulse-danger {
+  animation: pulse 2s infinite;
+}
