@@ -57,7 +57,7 @@ class DataProcessor:
     def get_latest(self) -> SensorData:
         if self.history:
             return self.history[-1]
-        return None
+        return SensorData(gas=0.0, accel_x=0.0, accel_y=0.0, accel_z=1.0, timestamp=datetime.utcnow().isoformat())
 
 # Singleton instance
 data_processor = DataProcessor()

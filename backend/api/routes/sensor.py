@@ -52,6 +52,4 @@ def get_latest_sensor_data(
             return latest_ts
 
     latest = data_processor.get_latest()
-    if not latest:
-        raise HTTPException(status_code=404, detail="No sensor data available yet")
     return latest
