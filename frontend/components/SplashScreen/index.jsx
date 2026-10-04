@@ -3,6 +3,11 @@ import { ShieldAlert } from 'lucide-react';
 
 const SplashScreen = ({ onFinish }) => {
   const [phase, setPhase] = useState('enter'); // 'enter' | 'show' | 'exit'
+  const onFinishRef = React.useRef(onFinish);
+
+  useEffect(() => {
+    onFinishRef.current = onFinish;
+  });
 
   useEffect(() => {
     // Phase 1: fade in
@@ -10,9 +15,9 @@ const SplashScreen = ({ onFinish }) => {
     // Phase 2: begin fade out after 2.8s
     const t2 = setTimeout(() => setPhase('exit'), 3200);
     // Phase 3: call onFinish after fade-out completes
-    const t3 = setTimeout(() => onFinish && onFinish(), 3800);
+    const t3 = setTimeout(() => onFinishRef.current && onFinishRef.current(), 3800);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [onFinish]);
+  }, []); // Run only once on mount
 
   return (
     <div style={{
