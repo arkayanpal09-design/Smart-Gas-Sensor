@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import SplashScreen from './components/SplashScreen';
 import Header from './components/Header';
-import WelcomeBanner from './components/WelcomeBanner';
 import SafetyStatus from './components/SafetyStatus';
 import DeviceStatus from './components/DeviceStatus';
 import GasMonitor from './components/GasMonitor';
@@ -13,6 +13,8 @@ import { getSensorData } from './services/api';
 import { getStatusFromValue, GAS_THRESHOLDS } from './utils/thresholds';
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   const [sensorData, setSensorData] = useState({
     gas: 150,
     accel_x: 0,
@@ -103,13 +105,15 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div className="dashboard-container">
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
+
+      <div className="dashboard-container" style={{
+        opacity: showSplash ? 0 : 1,
+        transition: 'opacity 0.6s ease-in-out',
+        pointerEvents: showSplash ? 'none' : 'auto'
+      }}>
         <div className="area-header">
           <Header />
-        </div>
-        
-        <div style={{ gridColumn: '1 / -1' }}>
-          <WelcomeBanner />
         </div>
         
         <div className="area-gas-monitor glass-panel">
