@@ -13,9 +13,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include Routers
+# Include Routers (both root and /api prefix to support Vercel service rewrites)
+app.include_router(health.router, tags=["health"])
 app.include_router(health.router, prefix="/api", tags=["health"])
+
+app.include_router(sensor.router, tags=["sensor"])
 app.include_router(sensor.router, prefix="/api", tags=["sensor"])
+
+app.include_router(device.router, tags=["device"])
 app.include_router(device.router, prefix="/api", tags=["device"])
 
 if __name__ == "__main__":

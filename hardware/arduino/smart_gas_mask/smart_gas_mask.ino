@@ -206,8 +206,12 @@ bool sendToThingSpeak(int gas, float ax, float ay, float az) {
   httpRequest += "Connection: close\r\n\r\n";
 
   // 3. Request CIPSEND prompt
+  delay(150);
+  while (espSerial.available()) espSerial.read();
+
   String cipsendCmd = "AT+CIPSEND=" + String(httpRequest.length());
   espSerial.println(cipsendCmd);
+  delay(150);
 
   bool promptReceived = false;
   unsigned long startPromptWait = millis();
@@ -226,7 +230,7 @@ bool sendToThingSpeak(int gas, float ax, float ay, float az) {
   }
 
   if (!promptReceived) {
-    Serial.println(F("ERROR: '>' prompt not received from ESP-01."));
+    Serial.println(F("ERROR: '>' prompt not received from ESP-01. Retrying send..."));
     return false;
   }
 
