@@ -1,5 +1,7 @@
+import os
 import datetime
-from fastapi import APIRouter, HTTPException, Request
+from typing import Optional
+from fastapi import APIRouter, HTTPException, Request, Query
 from models.sensor_data import SensorData
 from services.data_processor import data_processor
 
@@ -33,10 +35,22 @@ def bridge_sensor_data(data: SensorData, request: Request):
     }
 
 @router.get("/sensor-data/latest")
-def get_latest_sensor_data():
+def get_latest_sensor_data(
+    channel_id: Optional[str] = Query(None, description="Optional ThingSpeak Channel ID"),
+    read_api_key: Optional[str] = Query(None, description="Optional ThingSpeak Read API Key")
+):
     """
     Returns the latest reading for the frontend dashboard.
+    Fetches from ThingSpeak channel if configured or provided.
     """
+    ts_channel = channel_id or os.environ.get("THINGSPEAK_CHANNEL_ID") or "3520155"
+    ts_read_key = read_api_key or os.environ.get("THINGSPEAK_READ_KEY")
+
+    if ts_channel:
+        latest_ts = data_processor.fetch_thingspeak_latest(ts_channel, ts_read_key)
+        if latest_ts:
+            return latest_ts
+
     latest = data_processor.get_latest()
     if not latest:
         raise HTTPException(status_code=404, detail="No sensor data available yet")
