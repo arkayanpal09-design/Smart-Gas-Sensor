@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
+import WelcomeBanner from './components/WelcomeBanner';
 import SafetyStatus from './components/SafetyStatus';
 import DeviceStatus from './components/DeviceStatus';
 import GasMonitor from './components/GasMonitor';
@@ -105,6 +106,10 @@ function App() {
       <div className="dashboard-container">
         <div className="area-header">
           <Header />
+        </div>
+        
+        <div style={{ gridColumn: '1 / -1' }}>
+          <WelcomeBanner />
         </div>
         
         <div className="area-gas-monitor glass-panel">
