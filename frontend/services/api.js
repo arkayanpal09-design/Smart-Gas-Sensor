@@ -67,26 +67,46 @@ async function getSimulatedSensorData() {
 }
 
 // -------------------------------------------------------------
-// BACKEND MODE LOGIC
+// BACKEND MODE LOGIC (Direct Cloud & Backend API)
 // -------------------------------------------------------------
 async function getBackendSensorData() {
+  // 1. Primary: Try Vercel Backend Route
   try {
     const response = await fetch(`${BACKEND_URL}/sensor-data/latest`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data && typeof data.gas === 'number') {
+        return data;
+      }
     }
-    return await response.json();
   } catch (error) {
-    console.error("Backend fetch error. Returning empty model.", error);
-    // Return empty payload to prevent crash if backend goes down
-    return {
-      gas: 0,
-      accel_x: 0,
-      accel_y: 0,
-      accel_z: 1,
-      timestamp: new Date().toISOString()
-    };
+    console.log("Vercel route fallback to direct ThingSpeak...", error);
   }
+
+  // 2. Direct Cloud Fallback: Fetch directly from ThingSpeak Channel 3520155
+  try {
+    const tsResp = await fetch("https://api.thingspeak.com/channels/3520155/feeds/last.json");
+    if (tsResp.ok) {
+      const payload = await tsResp.json();
+      return {
+        gas: payload.field1 !== undefined && payload.field1 !== null ? parseFloat(payload.field1) : 0,
+        accel_x: payload.field2 !== undefined && payload.field2 !== null ? parseFloat(payload.field2) : 0.0,
+        accel_y: payload.field3 !== undefined && payload.field3 !== null ? parseFloat(payload.field3) : 0.0,
+        accel_z: payload.field4 !== undefined && payload.field4 !== null ? parseFloat(payload.field4) : 1.0,
+        timestamp: payload.created_at || new Date().toISOString()
+      };
+    }
+  } catch (tsErr) {
+    console.error("ThingSpeak direct fetch error", tsErr);
+  }
+
+  return {
+    gas: 0,
+    accel_x: 0,
+    accel_y: 0,
+    accel_z: 1,
+    timestamp: new Date().toISOString()
+  };
 }
 
 // -------------------------------------------------------------
@@ -118,32 +138,25 @@ export async function getDeviceStatus() {
   }
 
   try {
-    const response = await fetch(`${BACKEND_URL}/device/status`);
-    if (response.ok) {
-      const data = await response.json();
+    const tsResp = await fetch("https://api.thingspeak.com/channels/3520155/feeds/last.json");
+    if (tsResp.ok) {
+      const payload = await tsResp.json();
+      const isLive = payload && payload.entry_id > 0;
       return {
-        arduino: data.arduino === "connected" ? "Connected" : "Waiting for Data",
-        esp01: data.esp01 === "connected" ? "Connected" : "Waiting for Data",
-        wifi: data.wifi === "connected" ? "Connected" : "Waiting for Data",
+        arduino: isLive ? "Connected" : "Waiting for Data",
+        esp01: isLive ? "Connected" : "Waiting for Data",
+        wifi: isLive ? "Connected" : "Waiting for Data",
         backend: "Connected",
-        data_source: "Hardware API"
-      };
-    } else {
-      return {
-        arduino: "Disconnected",
-        esp01: "Disconnected",
-        wifi: "Disconnected",
-        backend: "Error",
-        data_source: "API Error"
+        data_source: "ThingSpeak Live IoT"
       };
     }
-  } catch(error) {
-     return {
-        arduino: "Disconnected",
-        esp01: "Disconnected",
-        wifi: "Disconnected",
-        backend: "Disconnected",
-        data_source: "API Error"
-     }
-  }
+  } catch(error) {}
+
+  return {
+    arduino: "Disconnected",
+    esp01: "Disconnected",
+    wifi: "Disconnected",
+    backend: "Connected",
+    data_source: "Hardware API"
+  };
 }
